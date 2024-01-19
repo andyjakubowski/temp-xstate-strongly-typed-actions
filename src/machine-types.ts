@@ -1,33 +1,32 @@
-import { assign, createMachine, setup } from 'xstate';
+import { assign, createMachine, setup } from 'xstate'
 
 interface MachineTypes {
   events: {
-    type: 'UPDATE_PROFILE';
-    age: number;
-  };
+    type: 'UPDATE_PROFILE'
+    age: number
+  }
   actions: {
-    type: 'setAge';
+    type: 'setAge'
     params: {
-      age: number;
-    };
-  };
+      age: number
+    }
+  }
 }
 
 // ✅ Expected typing behavior
 
 const testMachine = createMachine({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   types: {} as MachineTypes,
   id: 'foo',
   on: {
     // Type error thrown as expected
     // Type 'string' is not assignable to type '{ age: number; }'.
     UPDATE_PROFILE: {
-      actions: [
-        { type: 'setAge', params: ({ event }) => 'some incorrect value' },
-      ],
+      actions: [{ type: 'setAge', params: ({ event }) => 'some incorrect value' }],
     },
   },
-});
+})
 
 testMachine.provide({
   actions: {
@@ -37,22 +36,21 @@ testMachine.provide({
     // }
     setAge: (_, params) => undefined,
   },
-});
+})
 
 // 🚨 Unexpected typing behavior
 const testMachineTwo = setup({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   types: {} as MachineTypes,
 }).createMachine({
   id: 'foo',
   on: {
     // Type error is not thrown
     UPDATE_PROFILE: {
-      actions: [
-        { type: 'setAge', params: ({ event }) => 'some incorrect value' },
-      ],
+      actions: [{ type: 'setAge', params: ({ event }) => 'some incorrect value' }],
     },
   },
-});
+})
 
 testMachineTwo.provide({
   actions: {
@@ -60,12 +58,13 @@ testMachineTwo.provide({
     // params: NonReducibleUnknown
     setAge: (_, params) => undefined,
   },
-});
+})
 
 // ✅ Expected typing behavior
 const testMachineThree = setup({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   types: {} as {
-    events: { type: 'UPDATE_PROFILE'; age: number };
+    events: { type: 'UPDATE_PROFILE'; age: number }
   },
   actions: {
     setAge: (_, params: { age: number }) => undefined,
@@ -89,7 +88,7 @@ const testMachineThree = setup({
       },
     },
   },
-});
+})
 
 testMachineThree.provide({
   actions: {
@@ -101,10 +100,11 @@ testMachineThree.provide({
       age: (_, params) => params.age,
     }),
   },
-});
+})
 
 // 🚨 Unexpected typing behavior
 const testMachineFour = setup({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   types: {} as MachineTypes,
   actions: {
     setAge: (_, params) => undefined,
@@ -127,7 +127,7 @@ const testMachineFour = setup({
       },
     },
   },
-});
+})
 
 testMachineFour.provide({
   actions: {
@@ -137,4 +137,4 @@ testMachineFour.provide({
       age: (_, params) => undefined,
     }),
   },
-});
+})
