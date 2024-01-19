@@ -1,7 +1,3 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
 import { assign, createMachine, setup } from 'xstate';
 
 interface MachineTypes {
@@ -16,6 +12,8 @@ interface MachineTypes {
     };
   };
 }
+
+// ✅ Expected typing behavior
 
 const testMachine = createMachine({
   types: {} as MachineTypes,
@@ -41,8 +39,8 @@ testMachine.provide({
   },
 });
 
-//
-const testMachineWithSetup = setup({
+// 🚨 Unexpected typing behavior
+const testMachineTwo = setup({
   types: {} as MachineTypes,
 }).createMachine({
   id: 'foo',
@@ -56,7 +54,7 @@ const testMachineWithSetup = setup({
   },
 });
 
-testMachineWithSetup.provide({
+testMachineTwo.provide({
   actions: {
     // Undesired params type
     // params: NonReducibleUnknown
@@ -64,6 +62,7 @@ testMachineWithSetup.provide({
   },
 });
 
+// ✅ Expected typing behavior
 const testMachineThree = setup({
   types: {} as {
     events: { type: 'UPDATE_PROFILE'; age: number };
@@ -104,6 +103,7 @@ testMachineThree.provide({
   },
 });
 
+// 🚨 Unexpected typing behavior
 const testMachineFour = setup({
   types: {} as MachineTypes,
   actions: {
@@ -138,26 +138,3 @@ testMachineFour.provide({
     }),
   },
 });
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;
